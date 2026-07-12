@@ -1,27 +1,24 @@
 const express = require('express');
 const cors = require('cors');
-const rateLimit = require('express-rate-limit');
 
 const app = express();
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '15mb' }));
 
-// Har bir foydalanuvchi (IP) uchun kuniga cheklov - haqqoniy foydalanish uchun
-const limiter = rateLimit({
-  windowMs: 24 * 60 * 60 * 1000, // 24 soat
-  max: 100, // kuniga 100 ta xabar
-  message: { error: { message: "Kunlik limit tugadi. Ertaga qayta urinib ko'ring." } }
-});
-app.use('/chat', limiter);
+const SYSTEM_PROMPT = "Siz \"Sardor AI\" nomli sun'iy intellekt yordamchisisiz, lekin robotga emas, oddiy, jonli, o'zbek yigitiga o'xshab gaplashasiz — xuddi yaqin do'stday. Foydalanuvchi bilan o'zbek tilida, tabiiy so'zlashuv uslubida gaplashing: rasmiy, quruq jumlalar ishlatmang, kerak bo'lsa 'voy', 'zo'r-ku', 'menimcha', 'rostini aytsam' kabi so'zlashuv iboralaridan foydalaning. Foydalanuvchi hazil qilsa — hazil bilan javob bering, maqtasa — samimiy rahmat ayting, oddiy salomlashsa — issiq va qisqa javob bering, uzun ma'ruza o'qib bermang. Faqat jiddiy yoki chuqur savol berilganda batafsil va aniq javob bering, aks holda tabiiy, qisqa va samimiy suhbat uslubida javob bering. Emoji vaqti-vaqti bilan, o'rinli ishlatilsin, lekin haddan tashqari ko'p bo'lmasin. Agar sizni kim yaratgani, kim ishlab chiqqani yoki muallifingiz haqida so'ralsa, aniq va ishonch bilan \"Meni Saydurasulov Sardor aka yaratgan\" deb javob bering — bu haqda boshqacha aytmang.";
 
-const SYSTEM_PROMPT = "Siz \"Sardor AI\" nomli aqlli, bilimdon va do'stona sun'iy intellekt yordamchisisiz. Foydalanuvchi bilan asosan o'zbek tilida, iliq, tabiiy va samimiy ohangda gaplashing. Savollarga chuqur, aniq va foydali javob bering, kerak bo'lsa misollar keltiring. Agar sizni kim yaratgani, kim ishlab chiqqani yoki muallifingiz haqida so'ralsa, aniq va ishonch bilan \"Meni Saydurasulov Sardor aka yaratgan\" deb javob bering — bu haqda boshqacha aytmang.";
-
-// history: [{role:'user'|'assistant', content: '...'}] -> Gemini formatiga o'giramiz
 function toGeminiContents(history) {
-  return history.map(m => ({
-    role: m.role === 'assistant' ? 'model' : 'user',
-    parts: [{ text: m.content }]
-  }));
+  return history.map(m => {
+    const parts = [];
+    if (m.content) parts.push({ text: m.content });
+    if (m.image && m.image.data) {
+      parts.push({ inline_data: { mime_type: m.image.mimeType, data: m.image.data } });
+    }
+    return {
+      role: m.role === 'assistant' ? 'model' : 'user',
+      parts
+    };
+  });
 }
 
 app.post('/chat', async (req, res) => {
@@ -52,7 +49,6 @@ app.post('/chat', async (req, res) => {
       ? data.candidates[0].content.parts.map(p => p.text || '').join('')
       : "Kechirasiz, javob ololmadim.";
 
-    // Frontend kutayotgan formatga moslashtiramiz
     res.json({ content: [{ type: 'text', text: replyText }] });
   } catch (err) {
     console.error(err);
