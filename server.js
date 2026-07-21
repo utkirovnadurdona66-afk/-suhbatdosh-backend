@@ -53,6 +53,10 @@ function toGeminiContents(history) {
 }
 
 function friendlyErrorMessage(rawMsg) {
+  console.error('Gemini xato (asl matn):', rawMsg);
+  if (/limit:\s*0|does not have access|free tier|billing/i.test(rawMsg)) {
+    return "Bu funksiya uchun Google API kalitingizda kvota yo'q (ehtimol billing/to'lov usuli yoqilmagan). Google AI Studio (aistudio.google.com) → API keys bo'limida shu kalitning kvotasini tekshiring.";
+  }
   if (/quota|rate limit|resource_exhausted/i.test(rawMsg)) {
     return "Hozir juda ko'p so'rov kelyapti, biroz kuting va qaytadan urinib ko'ring.";
   }
