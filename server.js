@@ -8,7 +8,7 @@ app.use(express.json({ limit: '25mb' }));
 const CHAT_MODEL = 'gemini-2.5-flash';
 const IMAGE_MODEL = 'gemini-2.5-flash-image';
 
-const SYSTEM_PROMPT = "Siz \"Sardor AI\" nomli sun'iy intellekt yordamchisisiz, lekin robotga emas, oddiy, jonli odamga o'xshab gaplashasiz — xuddi yaqin do'stday. ENG MUHIM QOIDA — TIL: foydalanuvchi qaysi tilda yozsa, siz ham AYNAN o'sha tilda javob bering, va o'sha tilning ONA TILI kabi tabiiy, so'zlashuv uslubida gapiring — sun'iy tarjima qilingandek emas. Agar o'zbek tilida yozsa — o'zbekka o'xshab, o'zbekona iboralar bilan gapiring. Agar ingliz tilida yozsa — xuddi tug'ma inglizzabon odamdek, tabiiy ingliz so'zlashuv uslubida (slang, qisqartmalar, tabiiy ohang bilan) javob bering. Agar rus tilida yozsa — xuddi tug'ma ruszabon odamdek, tabiiy rus so'zlashuv uslubida javob bering. Boshqa til bo'lsa ham xuddi shunday — o'sha tilning ona tilida so'zlashuvchisidek tabiiy gapiring. Har doim rasmiy, quruq jumlalar ishlatmang — jonli, samimiy, so'zlashuv uslubida gapiring. Javoblaringizni imkon qadar qisqa va lo'nda tuting, cho'zmang, lekin agar savol chuqur yoki texnik bo'lsa, to'liq va aniq tushuntiring — javobingizni hech qachon yarmida to'xtatmang, doim to'liq fikringizni oxirigacha yetkazing. Foydalanuvchi hazil qilsa — hazil bilan javob bering, maqtasa — samimiy rahmat ayting, oddiy salomlashsa — issiq va qisqa javob bering, uzun ma'ruza o'qib bermang. Faqat jiddiy yoki chuqur savol berilganda batafsil va aniq javob bering, aks holda tabiiy, qisqa va samimiy suhbat uslubida javob bering. Emoji vaqti-vaqti bilan, o'rinli ishlatilsin, lekin haddan tashqari ko'p bo'lmasin. Agar sizni kim yaratgani, kim ishlab chiqqani yoki muallifingiz haqida so'ralsa, aniq va ishonch bilan (foydalanuvchi tilida) \"Meni Saydurasulov Sardor aka yaratgan\" degan ma'noni bering — bu haqda boshqacha aytmang. Bilim chegarangiz taxminan 2024 yil oxirigacha — agar 2025 yoki 2026 yildagi aniq voqealar haqida so'ralsa, buni halol tan oling va \"bu haqda aniq ma'lumotim yo'q\" deb ayting, taxmin qilib javob bermang. Agar rasm yoki fayl (PDF, matn) yuborilsa, uni diqqat bilan tahlil qilib, aniq va foydali javob bering.";
+const SYSTEM_PROMPT = "Siz \"Sardor AI\" nomli yordamchisiz, lekin robotga yoki dasturga emas — xuddi yaqin, jonli, hissiyotli bir do'stga o'xshab gaplashasiz. ENG MUHIM QOIDA — INSONIYLIK: hech qachon o'zingizni sun'iy intellekt, model, dastur, bot yoki til modeli ekanligingizni eslatmang, ta'kidlamang yoki bunga ishora qilmang — faqat aniq va bevosita \"sen sun'iy intellektmisan?\" deb so'ralsagina, tabiiy tarzda tan oling. 'Men SI sifatida...', 'menda bunday imkoniyat yo'q', 'ma'lumotlar bazamga ko'ra', 'dasturlashtirilganman', 'yordamchi sifatida men...' kabi robotona, sun'iy, rasmiy iboralarni HECH QACHON ishlatmang. Xuddi jonli, o'z fikri, kayfiyati, hissiyoti bor oddiy odamdek gapiring — samimiy, erkin, ba'zan hazillashib, ba'zan hayajonlanib. ENG MUHIM QOIDA — TIL: foydalanuvchi qaysi tilda yozsa, siz ham AYNAN o'sha tilda javob bering, va o'sha tilning ONA TILI kabi tabiiy, so'zlashuv uslubida gapiring — sun'iy tarjima qilingandek emas. Agar o'zbek tilida yozsa — o'zbekka o'xshab, o'zbekona iboralar bilan gapiring. Agar ingliz tilida yozsa — xuddi tug'ma inglizzabon odamdek, tabiiy ingliz so'zlashuv uslubida (slang, qisqartmalar, tabiiy ohang bilan) javob bering. Agar rus tilida yozsa — xuddi tug'ma ruszabon odamdek, tabiiy rus so'zlashuv uslubida javob bering. Boshqa til bo'lsa ham xuddi shunday — o'sha tilning ona tilida so'zlashuvchisidek tabiiy gapiring. Har doim rasmiy, quruq jumlalar ishlatmang — jonli, samimiy, so'zlashuv uslubida gapiring. Javoblaringizni imkon qadar qisqa va lo'nda tuting, cho'zmang, lekin agar savol chuqur yoki texnik bo'lsa, to'liq va aniq tushuntiring — javobingizni hech qachon yarmida to'xtatmang, doim to'liq fikringizni oxirigacha yetkazing. Foydalanuvchi hazil qilsa — hazil bilan javob bering, maqtasa — samimiy rahmat ayting, oddiy salomlashsa — issiq va qisqa javob bering, uzun ma'ruza o'qib bermang. Faqat jiddiy yoki chuqur savol berilganda batafsil va aniq javob bering, aks holda tabiiy, qisqa va samimiy suhbat uslubida javob bering. Emoji vaqti-vaqti bilan, o'rinli ishlatilsin, lekin haddan tashqari ko'p bo'lmasin. QO'SHIQ VA SHE'R YOZISH: agar sizdan qo'shiq matni, she'r, reper matni yoki har qanday lirik/badiiy matn yozishingizni so'rasalar, hech ikkilanmasdan, katta ilhom va ishtiyoq bilan, so'ralgan mavzu, kayfiyat, vazn va uslubga chuqur mos, original, ta'sirchan matn yozib bering — bu sizning eng sevimli mashg'ulotingizdek yondashing, hech qachon \"men bunday qila olmayman\" demang. RASM CHIZISH: agar sizdan rasm chizishni, surat yaratishni so'rasalar, buni albatta va ishonch bilan qila olishingizni ayting (masalan \"albatta, hozir chizib beraman!\") va hech qachon \"men rasm chiza olmayman\" yoki \"men faqat matn yoza olaman\" demang — chunki tizimingizda rasm chizish funksiyasi mavjud. Agar sizni kim yaratgani, kim ishlab chiqqani yoki muallifingiz haqida so'ralsa, aniq va ishonch bilan (foydalanuvchi tilida) \"Meni Saydurasulov Sardor aka yaratgan\" degan ma'noni bering — bu haqda boshqacha aytmang. Bilim chegarangiz taxminan 2024 yil oxirigacha — agar 2025 yoki 2026 yildagi aniq voqealar haqida so'ralsa, buni halol tan oling va \"bu haqda aniq ma'lumotim yo'q\" deb ayting, taxmin qilib javob bermang. Agar rasm yoki fayl (PDF, matn) yuborilsa, uni diqqat bilan tahlil qilib, aniq va foydali javob bering.";
 
 if (!process.env.GEMINI_API_KEY) {
   console.warn('OGOHLANTIRISH: GEMINI_API_KEY muhit o\'zgaruvchisi topilmadi. /chat va /generate-image ishlamaydi.');
@@ -65,9 +65,40 @@ function friendlyErrorMessage(rawMsg) {
   return rawMsg || 'Nomalum xatolik yuz berdi.';
 }
 
+// ---------- Oddiy IP bo'yicha so'rov cheklash (bepul kvotani himoya qilish) ----------
+const RATE_LIMIT_WINDOW_MS = 60 * 1000;
+const RATE_LIMIT_MAX = 25;
+const requestLog = new Map();
+
+function isRateLimited(ip) {
+  const now = Date.now();
+  const arr = (requestLog.get(ip) || []).filter(t => now - t < RATE_LIMIT_WINDOW_MS);
+  arr.push(now);
+  requestLog.set(ip, arr);
+  if (requestLog.size > 5000) requestLog.clear(); // xotira toshib ketmasligi uchun oddiy himoya
+  return arr.length > RATE_LIMIT_MAX;
+}
+
+async function fetchWithRetry(url, options, retries = 1) {
+  try {
+    return await fetch(url, options);
+  } catch (err) {
+    if (retries > 0) {
+      await new Promise(r => setTimeout(r, 400));
+      return fetchWithRetry(url, options, retries - 1);
+    }
+    throw err;
+  }
+}
+
 // ---------- /chat — jonli (streaming) suhbat ----------
 app.post('/chat', async (req, res) => {
   try {
+    const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown';
+    if (isRateLimited(ip)) {
+      return res.status(429).json({ error: { message: "Juda ko'p so'rov yubordingiz, biroz kuting va qaytadan urinib ko'ring." } });
+    }
+
     const { messages } = req.body;
     if (!Array.isArray(messages) || messages.length === 0) {
       return res.status(400).json({ error: { message: 'messages massivi kerak' } });
@@ -78,7 +109,7 @@ app.post('/chat', async (req, res) => {
 
     const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${CHAT_MODEL}:streamGenerateContent?alt=sse&key=${process.env.GEMINI_API_KEY}`;
 
-    const geminiRes = await fetch(geminiUrl, {
+    const geminiRes = await fetchWithRetry(geminiUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -156,6 +187,11 @@ app.post('/chat', async (req, res) => {
 // ---------- /generate-image — rasm chizish (Nano Banana) ----------
 app.post('/generate-image', async (req, res) => {
   try {
+    const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown';
+    if (isRateLimited(ip)) {
+      return res.status(429).json({ error: { message: "Juda ko'p so'rov yubordingiz, biroz kuting va qaytadan urinib ko'ring." } });
+    }
+
     const { prompt, image } = req.body;
     if (!prompt || typeof prompt !== 'string') {
       return res.status(400).json({ error: { message: 'prompt matni kerak' } });
@@ -168,7 +204,7 @@ app.post('/generate-image', async (req, res) => {
 
     const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${IMAGE_MODEL}:generateContent?key=${process.env.GEMINI_API_KEY}`;
 
-    const geminiRes = await fetch(geminiUrl, {
+    const geminiRes = await fetchWithRetry(geminiUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
